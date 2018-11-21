@@ -19,6 +19,7 @@ Description:
 #include <time.h>
 
 // function prototypes
+void setInfinity ( int numberOfNodes, int adjacencyMatrix[][ numberOfNodes ] );
 int numberOfRows ( FILE *filePtr );
 void printMatrix ( int numberOfNodes, int adjacencyMatrix[][ numberOfNodes ] );
 void createAdjMatrix ( int origin, int destination, int edgeWeight, int numberOfNodes, int adjacencyMatrix[][ numberOfNodes ] );
@@ -76,12 +77,47 @@ int main (void)
           puts ( "" );
      }
 
-     allPairShortestPath ( origin, destination, edgeWeight, numberOfNodes, adjacencyMatrix );
+     //sets the nodes 1,1, 2,2, 3,3,... N,N to infinity (currently 900)
+     setInfinity ( numberOfNodes, adjacencyMatrix );
+
+     int counter = 0;
+     while ( counter != numberOfNodes )
+     {
+          allPairShortestPath ( origin, destination, edgeWeight, numberOfNodes, adjacencyMatrix );
+          counter++;
+     }
      // close file pointer
      fclose ( filePtr );
      return 0;
 }
 
+/*
+     Sets the 0 values that aren't 1,1, 2,2, 3,3, ..., N,N, too infinity (900)
+     Parameters:
+          - numberOfNodes -> the size of the matrix (first value in the file)
+          - adjacencyMatrix[][ numberOfNodes ] -> the adjacencyMatrix showing what is connected
+*/
+void setInfinity ( int numberOfNodes, int adjacencyMatrix[][ numberOfNodes ] )
+{
+     //set all 0's to 900 (infinity)
+     // may change 200 for the other graphs (must be a large number)
+     for ( int row = 0; row < numberOfNodes; row++ )
+     {
+          for ( int col = 0; col < numberOfNodes; col++ )
+          {
+               if ( row == col )
+                    continue;
+               else if ( row != col && adjacencyMatrix [ row ][ col ] == 0 )
+                    adjacencyMatrix [ row ][ col ] = 900 ;
+               else
+                    continue;
+
+          }
+     }
+     puts ( "After infinity" );
+     printMatrix( numberOfNodes, adjacencyMatrix );
+
+}
 /*
      Method numberOfRows calculates how many rows in the file there are
      Parameters:
@@ -118,10 +154,7 @@ int numberOfRows ( FILE *filePtr )
 void createAdjMatrix ( int origin, int destination, int edgeWeight, int numberOfNodes, int adjacencyMatrix[][ numberOfNodes ] )
 {
      printf ( "Inserting edge between %d & %d, %d & %d\n", origin, destination, destination, origin );
-     // changed the values @origin and @destination to 1 if there is an edge
-     // adjacencyMatrix [ origin ][ destination ] = 1;
-     // adjacencyMatrix [ destination ][ origin ] = 1;
-     // if we use edge weight as the number in the matrix, can we use that?
+     //sets the edge weight where there are connections between origin and destination and destination and origin (undirected graph)
      adjacencyMatrix [ origin ][ destination ] = edgeWeight;
      adjacencyMatrix [ destination ][ origin ] = edgeWeight;
 }// end of createdAdjMatrix
@@ -167,28 +200,45 @@ void printMatrix( int numberOfNodes, int adjacencyMatrix[][ numberOfNodes ] )
 // will an edge weight ever be 0 in dijkstras?
 void allPairShortestPath ( int origin, int destination, int edgeWeight, int numberOfNodes, int adjacencyMatrix[][ numberOfNodes ] )
 {
-     //set all 0's to 200 (infinity)
-     // may change 200 for the other graphs (must be a large number)
-     for ( int row = 0; row < numberOfNodes; row++ )
-     {
-          for ( int col = 0; col < numberOfNodes; col++ )
-          {
-               if ( adjacencyMatrix [ row ][ col ] == 0 )
-                    adjacencyMatrix [ row ][ col ] = 200 ;
-               else
-                    continue;
-          }
-     }
-     printMatrix( numberOfNodes, adjacencyMatrix );
+     int currentWeight = 0, rowWeight = 0, colWeight = 0;
 
      for ( int index = 0; index < numberOfNodes; index++ )
      {
           for ( int row = 0; row < numberOfNodes; row++ )
           {
+               // if ( adjacencyMatrix[ index ][ row ] != 900 )
+               // {
+               //      currentWeight = adjacencyMatrix [ index ][ row ];
+               //      // printf ( "Current weight %d, row and index number %d\n", currentWeight, adjacencyMatrix[ index ][ row ] );
+               // }
+               // else if ( adjacencyMatrix [ index ][ row ] == 900 )
+               // {
+               //
+               // }
                for ( int col = 0; col < numberOfNodes; col++ )
                {
-                    adjacencyMatrix [ index ] ;
+                    if ( ( currentWeight + adjacencyMatrix [ index ][ col ] < adjacencyMatrix[ row ][ col ] ) && adjacencyMatrix [ row ][ col ] != 900 )
+                    {
+                         if ( adjacencyMatrix [ row ][ col ] == 900 )
+                         {
+
+                         }
+                         // printf ( "Change occured at %d, %d, current weight = %d\n", index, row, currentWeight );
+                         adjacencyMatrix [ index ][ col ] = currentWeight + adjacencyMatrix [ row ][ col ];
+                         currentWeight = 0;
+                    }
+                    else if ( ( adjacencyMatrix [ index ][ col ] + adjacencyMatrix [ row ][ col ] == adjacencyMatrix[ row ][ col ] ) )
+                    {
+                         continue;
+                    }
+                    // else
+                    // {
+                    //      continue;
+                    // }
+                    // adjacencyMatrix [ index ][ col ];
+                    // printf ( "%d  \n", adjacencyMatrix [ index ][col]);
                }
           }
      }
+     // printMatrix ( numberOfNodes, adjacencyMatrix );
 }
