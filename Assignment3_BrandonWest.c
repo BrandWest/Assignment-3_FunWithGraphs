@@ -22,6 +22,7 @@ Description:
 int numberOfRows ( FILE *filePtr );
 void printMatrix ( int numberOfNodes, int adjacencyMatrix[][ numberOfNodes ] );
 void createAdjMatrix ( int origin, int destination, int edgeWeight, int numberOfNodes, int adjacencyMatrix[][ numberOfNodes ] );
+void allPairShortestPath ( int origin, int destination, int edgeWeight, int numberOfNodes, int adjacencyMatrix[][ numberOfNodes ] );
 
 int main (void)
 {
@@ -75,6 +76,7 @@ int main (void)
           puts ( "" );
      }
 
+     allPairShortestPath ( origin, destination, edgeWeight, numberOfNodes, adjacencyMatrix );
      // close file pointer
      fclose ( filePtr );
      return 0;
@@ -132,11 +134,12 @@ void createAdjMatrix ( int origin, int destination, int edgeWeight, int numberOf
 */
 void printMatrix( int numberOfNodes, int adjacencyMatrix[][ numberOfNodes ] )
 {
+     char space = ' ';
      // space for formatting
-     printf ( "%6s" );
+     printf ( "%6c", space );
      // for loop to create the column numbers
      for ( int index = 0; index < numberOfNodes; index++ )
-          printf ( "[,%d]\t", index );
+          printf ( "[,%d]%4c", index, space );
      puts( "" );
      // prints the matrix
      for (int row = 0; row < numberOfNodes; row++ )
@@ -151,3 +154,41 @@ void printMatrix( int numberOfNodes, int adjacencyMatrix[][ numberOfNodes ] )
           puts ( "" );
      }
 }// end of printMatrix Function
+
+/*
+     Method allPairsShortestPath finds shortest path in the graph
+     Parameters:
+          - origin -> The first coloum of the text file
+          - destination -> the second column of the text file
+          - edgeWeight -> The weight of the edge between the nodes
+          - numberOfNodes -> the size of the matrix (first value in the file)
+          - adjacencyMatrix[][ numberOfNodes ] -> the adjacencyMatrix showing what is connected
+*/
+// will an edge weight ever be 0 in dijkstras?
+void allPairShortestPath ( int origin, int destination, int edgeWeight, int numberOfNodes, int adjacencyMatrix[][ numberOfNodes ] )
+{
+     //set all 0's to 200 (infinity)
+     // may change 200 for the other graphs (must be a large number)
+     for ( int row = 0; row < numberOfNodes; row++ )
+     {
+          for ( int col = 0; col < numberOfNodes; col++ )
+          {
+               if ( adjacencyMatrix [ row ][ col ] == 0 )
+                    adjacencyMatrix [ row ][ col ] = 200 ;
+               else
+                    continue;
+          }
+     }
+     printMatrix( numberOfNodes, adjacencyMatrix );
+
+     for ( int index = 0; index < numberOfNodes; index++ )
+     {
+          for ( int row = 0; row < numberOfNodes; row++ )
+          {
+               for ( int col = 0; col < numberOfNodes; col++ )
+               {
+                    adjacencyMatrix [ index ] ;
+               }
+          }
+     }
+}
