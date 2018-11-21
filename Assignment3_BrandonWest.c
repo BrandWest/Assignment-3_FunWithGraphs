@@ -12,35 +12,24 @@ Description:
     This assignment focuses on graphs and thier implementation in c.
     They will use an adjacenty matric data structure and output the information in matrix
      information in matrix form O(n^2)
-
-     Graph format: First line contains the number of vertices in the graph, Assume 'n'
-     identifed by 1,2,3,...,n-1
-     the rest of the lines related to info on the undirected edge, whihc is characterized
-     by 3 numbers:
-        - ID of source vertex
-        - ID of target vertex
-        - weight of the edge
-        - since undirected, should hold edges that include nodes (a,b) and (b,a)
-
  */
-
- // my plan to make this is to use structures and arrays, and when searching through the
- // structures, I'm going to check what it looks like with its degrees of edges
-
 
 #include <stdio.h>
 #include <stdlib.h>
 #include <time.h>
 
 // function prototypes
+int numberOfRows ( FILE *filePtr );
 void printMatrix ( int numberOfNodes, int adjacencyMatrix[][ numberOfNodes ] );
-void createAdjMatrix ( int origin, int destination, int numberOfNodes, int adjacencyMatrix[][ numberOfNodes ] );
+void createAdjMatrix ( int origin, int destination, int edgeWeight, int numberOfNodes, int adjacencyMatrix[][ numberOfNodes ] );
 
 int main (void)
 {
-     int numberOfNodes = 0, rows = 0, cols = 0, counter = 0,
+     // variables
+     // cols will always be 3.
+     int numberOfNodes = 0, rows = 0, cols = 3,
          origin = 0, destination = 0, edgeWeight = 0;
-     char characters;
+     // file pointer position
      FILE *filePtr;
 
      // attempts to open file pointer for textGraph text
@@ -55,56 +44,33 @@ int main (void)
      // file pointer successful, reading the file.
      else
           puts ( "Reading file..." );
-
      // check the number of rows in the matrix while the filePtr doesnt have end of file marker
-     while ( !feof ( filePtr ) )
-     {
-          // if characters is not the newline and the loop is in its first pass
-          if ( characters != '\n' && counter == 0 )
-          {
-               // checks to see the number of coloums. can be variable
-               while ( characters != '\n')
-               {
-                    // gets the characters from the file to see how many cols there are
-                    characters = fgetc( filePtr );
-                    cols++;
-               }
-               printf ( "Number of coloums: = %d\n", cols );
-               counter++;
-          }
-          else if ( characters == '\n' )
-               rows++;
-          // gets the charcters to see how many rows there are
-          characters = fgetc( filePtr );
-     }
-
-     // initalize the array to be variable from file
-     int storageArray[ rows ][ cols ];
-
+     rows = numberOfRows ( filePtr );
      // rewinds the filePtr to beginning of the file after getting the number of rows and cols
      rewind ( filePtr );
+     // initalize the array to be variable from file
+     int storageArray[ rows ][ cols ];
      // removes the first number (number of nodes in the graph -- allows for varilbe input)
      fscanf ( filePtr, "%d", &numberOfNodes );
-
+     // initalizes the adjacencyMatrix
      int adjacencyMatrix [ numberOfNodes ][ numberOfNodes ];
+
+     // initalizes the adjacencyMatrix values to 0
      for ( int row = 0; row < numberOfNodes; row++ )
      {
           for ( int col = 0; col < numberOfNodes; col++ )
           {
-               // initalizes the array to 0
                adjacencyMatrix[ row ][ col ] = 0;
           }
      }
-
-     puts ( "" );
-     // inserts the filePtr number into the storageArray at positions in the 2d positions
-
+     // for loop to control the removal from the file, the origin, destination, and edge weight
      for ( int index = 0; index < rows; index++ )
      {
           fscanf ( filePtr, "%d", &origin );
           fscanf ( filePtr, "%d", &destination );
           fscanf ( filePtr, "%d", &edgeWeight );
-          createAdjMatrix( origin, destination, numberOfNodes, adjacencyMatrix );
+          // creates the adj matrix
+          createAdjMatrix( origin, destination, edgeWeight, numberOfNodes, adjacencyMatrix );
           printMatrix( numberOfNodes, adjacencyMatrix );
           puts ( "" );
      }
@@ -114,28 +80,73 @@ int main (void)
      return 0;
 }
 
-void createAdjMatrix ( int origin, int destination, int numberOfNodes, int adjacencyMatrix[][ numberOfNodes ] )
+/*
+     Method numberOfRows calculates how many rows in the file there are
+     Parameters:
+          - FILE *filePtr -> file pointer for the position of the file.
+*/
+int numberOfRows ( FILE *filePtr )
+{
+     // variables
+     char characters;
+     int counter = 0, rows = 0;
+
+     // while not at the end of the pointer file
+     while ( !feof ( filePtr ) )
+     {
+          // checks the character if its not \n continue checking to see number of rows in the file
+          characters = fgetc( filePtr );
+          if ( characters == '\n' )
+               rows++;
+     }
+     // returnts the value calculated from the rows
+     return rows;
+}// end of numberOfRows function
+
+/*
+     Method creates the adjacencyMatrix
+     Parameters:
+          - origin -> The first coloum of the text file
+          - destination -> the second column of the text file
+          - edgeWeight -> The weight of the edge between the nodes
+          - numberOfNodes -> the size of the matrix (first value in the file)
+          - adjacencyMatrix[][ numberOfNodes ] -> the adjacencyMatrix showing what is connected
+
+*/
+void createAdjMatrix ( int origin, int destination, int edgeWeight, int numberOfNodes, int adjacencyMatrix[][ numberOfNodes ] )
 {
      printf ( "Inserting edge between %d & %d, %d & %d\n", origin, destination, destination, origin );
-     adjacencyMatrix [ origin ][ destination ] = 1;
-     adjacencyMatrix [ destination ][ origin ] = 1;
-}
+     // changed the values @origin and @destination to 1 if there is an edge
+     // adjacencyMatrix [ origin ][ destination ] = 1;
+     // adjacencyMatrix [ destination ][ origin ] = 1;
+     // if we use edge weight as the number in the matrix, can we use that?
+     adjacencyMatrix [ origin ][ destination ] = edgeWeight;
+     adjacencyMatrix [ destination ][ origin ] = edgeWeight;
+}// end of createdAdjMatrix
 
-// prints the matrix
+/*
+     Method prints out the matrix
+     Parameters:
+          - numberOfNodes -> The size of the adjacencyMatrix
+          - adjacencyMatrix[][ numberOfNodes ] -> the adjacencyMatrix showing what is connected
+*/
 void printMatrix( int numberOfNodes, int adjacencyMatrix[][ numberOfNodes ] )
 {
      // space for formatting
-     printf ( "  " );
+     printf ( "%6s" );
+     // for loop to create the column numbers
      for ( int index = 0; index < numberOfNodes; index++ )
-          printf ( "%4d", index );
-     puts( "\n" );
+          printf ( "[,%d]\t", index );
+     puts( "" );
      // prints the matrix
      for (int row = 0; row < numberOfNodes; row++ )
      {
-          printf ( "%d  ", row );
+          // prints the row numberss
+          printf ( "[%d,]\t", row );
+          // prints the adjacencyMatrix
           for ( int col = 0; col < numberOfNodes; col++ )
           {
-               printf ( "  %-2d", adjacencyMatrix [ row ][ col ] );
+               printf ( "%d\t", adjacencyMatrix [ row ][ col ] );
           }
           puts ( "" );
      }
