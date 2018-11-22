@@ -106,7 +106,7 @@ void setInfinity ( int numberOfNodes, int adjacencyMatrix[][ numberOfNodes ] )
           for ( int col = 0; col < numberOfNodes; col++ )
           {
                if ( row == col )
-                    continue;
+                    adjacencyMatrix [ row ][ col ] = 0;
                else if ( row != col && adjacencyMatrix [ row ][ col ] == 0 )
                     adjacencyMatrix [ row ][ col ] = 900 ;
                else
@@ -206,37 +206,19 @@ void allPairShortestPath ( int origin, int destination, int edgeWeight, int numb
      {
           for ( int row = 0; row < numberOfNodes; row++ )
           {
-               // if ( adjacencyMatrix[ index ][ row ] != 900 )
-               // {
-               //      currentWeight = adjacencyMatrix [ index ][ row ];
-               //      // printf ( "Current weight %d, row and index number %d\n", currentWeight, adjacencyMatrix[ index ][ row ] );
-               // }
-               // else if ( adjacencyMatrix [ index ][ row ] == 900 )
-               // {
-               //
-               // }
+
                for ( int col = 0; col < numberOfNodes; col++ )
                {
-                    if ( ( currentWeight + adjacencyMatrix [ index ][ col ] < adjacencyMatrix[ row ][ col ] ) && adjacencyMatrix [ row ][ col ] != 900 )
+                    if ( adjacencyMatrix [ row ][ col ] != 0 )
                     {
-                         if ( adjacencyMatrix [ row ][ col ] == 900 )
+                         currentWeight = adjacencyMatrix[  index ][ row ] + adjacencyMatrix[ index ][ col ];
+                         if ( adjacencyMatrix[ row ][ col ] > currentWeight )
                          {
-
+                              printf ( "Weight of edge: %d\nCurrent Weight: %d\nIndex: [%d,%d]\n", adjacencyMatrix[ row ][ col ], currentWeight, row, col );
+                              adjacencyMatrix[ row ][ col ] = currentWeight;
+                              printMatrix ( numberOfNodes, adjacencyMatrix );
                          }
-                         // printf ( "Change occured at %d, %d, current weight = %d\n", index, row, currentWeight );
-                         adjacencyMatrix [ index ][ col ] = currentWeight + adjacencyMatrix [ row ][ col ];
-                         currentWeight = 0;
-                    }
-                    else if ( ( adjacencyMatrix [ index ][ col ] + adjacencyMatrix [ row ][ col ] == adjacencyMatrix[ row ][ col ] ) )
-                    {
-                         continue;
-                    }
-                    // else
-                    // {
-                    //      continue;
-                    // }
-                    // adjacencyMatrix [ index ][ col ];
-                    // printf ( "%d  \n", adjacencyMatrix [ index ][col]);
+                    }// controls if itm is infinity
                }
           }
      }
