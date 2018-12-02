@@ -240,34 +240,49 @@ void allPairShortestPath ( int origin, int destination, int edgeWeight, int numb
 }//end of allPairShortestPath function
 
 
+/*
+     This method finds the central node which is the max value of the rows, but min value of those maxes
+     Receives numberOfNodes -> To know how long to run the loops
+              adjacencyMatrix[][] -> to manipulate the array
+*/
 int findCentralNode ( int numberOfNodes, int adjacencyMatrix[][ numberOfNodes ] )
 {
+     // Variables
      int minNode = 0, maxNode = 0, centralNode = 0;
-
+     // controls the rows of the matrix
      for (int row = 0; row < numberOfNodes; row++ )
      {
+   	  // controls the colums of the matrix
           for ( int col = 0; col < numberOfNodes; col++ )
           {
+	       //If the maxNode is equal to or less than the adjmatrix at row and col, and row is equal to 0
                if ( maxNode <= adjacencyMatrix[ row ][ col ] && row == 0 )
                {
+		    // set maxNode and minNode
                     maxNode = adjacencyMatrix[ row ][ col ];
                     minNode = adjacencyMatrix[ row ][ col ];
                }
+	       // else if the max node is Greater than or equal to the adjmatrix row and col number
                else if ( maxNode <= adjacencyMatrix[ row ][ col ] )
+		    // set the max node to the current row and colum
                     maxNode = adjacencyMatrix[ row ][ col ];
-          }
+          }// end of for loop for cols
 
-          // go through each row, get max of the row, and figure out the min.
+	  //if the maxNode is less than or equal to the minNode
           if ( maxNode <=  minNode )
           {
+	       // minNode set to maxNode
                minNode = maxNode;
+	       // update the central node
                centralNode = row;
-          }
+          }// end of if
+	  // max node set to 0
           maxNode = 0;
-     }
-
+     }// end of row for loop
+     // if min node has the infinity value, return -1 to singify the node is not connected
      if ( minNode == 900 )
           return -1;
+     // return the central node value otherwise
      else
           return centralNode;
-}
+}// end of find central node method
