@@ -24,13 +24,16 @@ int numberOfRows ( FILE *filePtr );
 void printMatrix ( int numberOfNodes, int adjacencyMatrix[][ numberOfNodes ] );
 void createAdjMatrix ( int origin, int destination, int edgeWeight, int numberOfNodes, int adjacencyMatrix[][ numberOfNodes ] );
 void allPairShortestPath ( int origin, int destination, int edgeWeight, int numberOfNodes, int adjacencyMatrix[][ numberOfNodes ] );
+int findCentralNode ( int numberOfNodes, int adjacencyMatrix[][ numberOfNodes ] );
+
 
 int main (void)
 {
      // variables
      // cols will always be 3.
      int numberOfNodes = 0, rows = 0, cols = 3,
-         origin = 0, destination = 0, edgeWeight = 0;
+         origin = 0, destination = 0, edgeWeight = 0,
+         centralNode = 0;
      // file pointer position
      FILE *filePtr;
 
@@ -77,15 +80,21 @@ int main (void)
           puts ( "" );
      }
 
-     //sets the nodes 1,1, 2,2, 3,3,... N,N to infinity (currently 900)
+     //sets the nodes 1,1, 2,2, 3,3,... N,N to infinity (currently 900 because edge weights wont be this high)
      setInfinity ( numberOfNodes, adjacencyMatrix );
+     // performs the all pairs shortest path passing : origin, destination, weight, number of nodes, and the matrix
+     allPairShortestPath ( origin, destination, edgeWeight, numberOfNodes, adjacencyMatrix );
 
-     int counter = 0;
-     while ( counter != numberOfNodes )
-     {
-          allPairShortestPath ( origin, destination, edgeWeight, numberOfNodes, adjacencyMatrix );
-          counter++;
-     }
+     // finds central node (the least maximum row value)
+     centralNode = findCentralNode ( numberOfNodes, adjacencyMatrix );
+
+     if ( centralNode == -1 )
+          puts ( "Graph is not connected" );
+          // printf ( "This graph is not connected. %d", centralNode );
+     else
+          printf( "Central Node is: %d\n", centralNode );
+
+
      // close file pointer
      fclose ( filePtr );
      return 0;
@@ -197,30 +206,68 @@ void printMatrix( int numberOfNodes, int adjacencyMatrix[][ numberOfNodes ] )
           - numberOfNodes -> the size of the matrix (first value in the file)
           - adjacencyMatrix[][ numberOfNodes ] -> the adjacencyMatrix showing what is connected
 */
-// will an edge weight ever be 0 in dijkstras?
 void allPairShortestPath ( int origin, int destination, int edgeWeight, int numberOfNodes, int adjacencyMatrix[][ numberOfNodes ] )
 {
-     int currentWeight = 0, rowWeight = 0, colWeight = 0;
+     int currentWeight = 0, counter = 0;
 
+     printf ( "Counter in while loop = %d\n Number of nodes = %d", counter, numberOfNodes );
+     //n^3 for loops to run ovr the adj matrix and find shortest path
      for ( int index = 0; index < numberOfNodes; index++ )
      {
-          for ( int row = 0; row < numberOfNodes; row++ )
-          {
-
-               for ( int col = 0; col < numberOfNodes; col++ )
+     	for ( int row = 0; row < numberOfNodes; row++ )
+        {
+	    for ( int col = 0; col < numberOfNodes; col++ )
+            {
+               // if the row is not 1,1, 2,2, 3,3,....,n,n
+               if ( adjacencyMatrix [ row ][ col ] != 0 )
                {
-                    if ( adjacencyMatrix [ row ][ col ] != 0 )
-                    {
-                         currentWeight = adjacencyMatrix[  index ][ row ] + adjacencyMatrix[ index ][ col ];
-                         if ( adjacencyMatrix[ row ][ col ] > currentWeight )
-                         {
-                              printf ( "Weight of edge: %d\nCurrent Weight: %d\nIndex: [%d,%d]\n", adjacencyMatrix[ row ][ col ], currentWeight, row, col );
-                              adjacencyMatrix[ row ][ col ] = currentWeight;
-                              printMatrix ( numberOfNodes, adjacencyMatrix );
-                         }
-                    }// controls if itm is infinity
+                  // adds the values for the matrix and sets the currentWeight value
+                  currentWeight = adjacencyMatrix[  index ][ row ] + adjacencyMatrix[ index ][ col ];
+                  // if currentWeight is less than adjacencyMatrix
+                  if ( adjacencyMatrix[ row ][ col ] > currentWeight )
+                  {
+                      // records values of edge weight, currentWeight and the row/col location
+                      printf ( "Weight of edge: %d\nCurrent Weight: %d\nIndex: [%d,%d]\n", adjacencyMatrix[ row ][ col ], currentWeight, row, col );
+                      // sets the row col location on the matrix to currentWeight
+                      adjacencyMatrix[ row ][ col ] = currentWeight;
+                      // prints matrix after change
+                      printMatrix ( numberOfNodes, adjacencyMatrix );
+                  }// end of if
+               }// controls if it is not zero
+            }// end of col for loop
+        }// end of row for loop
+     }// end of index for loop
+}//end of allPairShortestPath function
+
+
+int findCentralNode ( int numberOfNodes, int adjacencyMatrix[][ numberOfNodes ] )
+{
+     int minNode = 0, maxNode = 0, centralNode = 0;
+
+     for (int row = 0; row < numberOfNodes; row++ )
+     {
+          for ( int col = 0; col < numberOfNodes; col++ )
+          {
+               if ( maxNode <= adjacencyMatrix[ row ][ col ] && row == 0 )
+               {
+                    maxNode = adjacencyMatrix[ row ][ col ];
+                    minNode = adjacencyMatrix[ row ][ col ];
                }
+               else if ( maxNode <= adjacencyMatrix[ row ][ col ] )
+                    maxNode = adjacencyMatrix[ row ][ col ];
           }
+
+          // go through each row, get max of the row, and figure out the min.
+          if ( maxNode <=  minNode )
+          {
+               minNode = maxNode;
+               centralNode = row;
+          }
+          maxNode = 0;
      }
-     // printMatrix ( numberOfNodes, adjacencyMatrix );
+
+     if ( minNode == 900 )
+          return -1;
+     else
+          return centralNode;
 }
